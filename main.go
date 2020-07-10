@@ -37,7 +37,7 @@ const (
 	dataEventMessageType = "DATA_MESSAGE"
 
 	// checkInterval is the delay in minutes to check for new Firehose events
-	checkInterval = 2 * time.Minute
+	defaultCheckInterval = 2 * time.Minute
 
 	// default proc window
 	defaultProcWindowHour = 5
@@ -212,6 +212,17 @@ func main() {
 	skip_error_log, err := strconv.ParseBool(skip_error_log_tmp)
 	if err != nil {
 		skip_error_log = false
+	}
+
+	checkInterval := defaultCheckInterval
+	checkInterval_tmp, ok := os.LookupEnv("CHECK_INTERVAL_SECOND")
+	if ok {
+		checkInterval_tmp2, err := strconv.Atoi(checkInterval_tmp)
+		if err != nil {
+			fmt.Errorf("error: fail to parse params, CHECK_INTERVAL_SECOND")
+			os.Exit(1)
+		}
+		checkInterval = time.Duration(checkInterval_tmp2) * time.Second
 	}
 
 	procWindowHour := defaultProcWindowHour
@@ -397,7 +408,7 @@ func main() {
 		}
 
 		if len(objects) == 0 {
-			fmt.Println("No new Firehose events found, waiting for next check interval.")
+			fmt.Printf("No new Firehose events found, waiting for next check interval. interval = %d sec\n", checkInterval.Seconds())
 			time.Sleep(checkInterval)
 		}
 	}
