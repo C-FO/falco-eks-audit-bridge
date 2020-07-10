@@ -408,7 +408,7 @@ func main() {
 		}
 
 		if len(objects) == 0 {
-			fmt.Printf("No new Firehose events found, waiting for next check interval. interval = %d sec\n", checkInterval.Seconds())
+			fmt.Printf("No new Firehose events found, waiting for next check interval. interval = %.1f sec\n", checkInterval.Seconds())
 			time.Sleep(checkInterval)
 		}
 	}
